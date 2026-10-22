@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1792562685 source:c:\users\usuario\desktop\topicos de programación 2026\tp_tópicos_2026_2c_miercoles_turingbyte\funciones.c
+	"funciones.h"
+
+1792559273 c:\users\usuario\desktop\topicos de programación 2026\tp_tópicos_2026_2c_miercoles_turingbyte\funciones.h
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+	<string.h>
+
+1792561027 source:c:\users\usuario\desktop\topicos de programación 2026\tp_tópicos_2026_2c_miercoles_turingbyte\main.c
+	"funciones.h"
+
