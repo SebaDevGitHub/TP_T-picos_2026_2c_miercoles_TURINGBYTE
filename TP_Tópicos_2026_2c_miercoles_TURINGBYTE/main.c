@@ -39,6 +39,12 @@ int main()
                 system("pause");
                 system("cls");
                 break;
+            case 3:
+                printf("\n3. Saldo trimestral por pais.\n\n");
+                Saldo_Trimestral_Por_Pais(fp_transferencias);
+                system("pause");
+                system("cls");
+                break;
             default:
                 printf("\nValor Invalido, por favor ingrese otro:\n");
                 system("pause");

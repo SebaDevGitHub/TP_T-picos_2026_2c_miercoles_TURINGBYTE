@@ -41,12 +41,21 @@ typedef struct
     double total_debito;
 } Continente;
 
+typedef struct
+{
+    char codigo[10];
+    char nombre[100];
+    double creditos[4];
+    double debitos[4];
+} PaisTrimestral;
+
 FILE *AbrirArchivo(char Nombre[], char Modo[]);
 
 /// Ejercicios
 //Ejercicio 1
 void Agrupamiento_x_pais(FILE *, FILE *);
 void clasificacion_Resumen_de_operaciones_por_continente(FILE *fp_transferencias, FILE *fp_paises);
+void Saldo_Trimestral_Por_Pais(FILE *fp_transferencias);
 
 // Genericas
 void Ubicar_Columnas_transferencia(char *linea, Columnas_Transferencias_personales *colm);

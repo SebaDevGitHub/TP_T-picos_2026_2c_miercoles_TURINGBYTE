@@ -10,7 +10,7 @@ FILE *AbrirArchivo(char Nombre[], char Modo[])
 return fp;
 }
 
-void Agrupamiento_x_pais(FILE *fp_transferencias, FILE *fp_paises)
+void Agrupamiento_x_pais(FILE *fp_transferencias, FILE *fp_paises) /// EJERCICIO 1
 {
     rewind(fp_transferencias);
     rewind(fp_paises);
@@ -166,7 +166,7 @@ void Agrupamiento_x_pais(FILE *fp_transferencias, FILE *fp_paises)
     mostrarVector(paises, cantPaises);
 }
 
-void clasificacion_Resumen_de_operaciones_por_continente(FILE *fp_transferencias, FILE *fp_paises)
+void clasificacion_Resumen_de_operaciones_por_continente(FILE *fp_transferencias, FILE *fp_paises) /// EJERCICIO 2
 {
     Continente continente[10];
     Continente *auxCont = continente;
@@ -195,7 +195,7 @@ void clasificacion_Resumen_de_operaciones_por_continente(FILE *fp_transferencias
     int cantContinentes = 0;
     int Numero_columnaPais;
     int Numero_columna;
-    int i;
+//    int i;
 
     char lineaPais[500];
     char *tokenPais;
@@ -445,6 +445,210 @@ void clasificacion_Resumen_de_operaciones_por_continente(FILE *fp_transferencias
     }
 
     printf("\nCantidad de continentes: %d\n", cantContinentes);
+}
+
+void Saldo_Trimestral_Por_Pais(FILE *fp_transferencias) /// EJERCICIO 3
+{
+    int Numero_columna;
+    int anio;
+    int trimestre;
+
+    char codigo_pais[10];
+    char nombre_pais[100];
+    char operacion[2];
+
+    double monto;
+
+    double saldo;
+
+    char *token;
+    char *separador;
+
+    int j, i;
+
+    anio = 0;
+    trimestre = 0;
+    monto = 0;
+
+    codigo_pais[0] = '\0';
+    nombre_pais[0] = '\0';
+    operacion[0] = '\0';
+
+    Columnas_Transferencias_personales Enumeracion;
+    Columnas_Transferencias_personales *colm = &Enumeracion;
+
+    PaisTrimestral paises[250];
+    int cant_paises = 0;
+
+    int anio_buscado;
+    char linea[1000];
+
+    rewind(fp_transferencias);
+
+    printf("Ingrese el anio a consultar: ");
+    scanf("%d", &anio_buscado);
+
+    fgets(linea, sizeof(linea), fp_transferencias);
+    Ubicar_Columnas_transferencia(linea, colm);
+
+    /* Aca vamos a procesar las transferencias */
+    while(fgets(linea, sizeof(linea), fp_transferencias))
+    {
+        Numero_columna = 0;
+        token = linea;
+
+        while(token != NULL)
+        {
+            separador = strchr(token, ';');
+
+            if(separador != NULL)
+            {
+                *separador = '\0';
+            }
+
+            /*
+               Aca vamos a identificar cada columna
+               y guardar los datos correspondientes.
+            */
+            if(Numero_columna == colm->Columna_ANIO)
+            {
+                anio = atoi(token);
+            }
+
+            if(Numero_columna == colm->Columna_TRIMESTRE)
+            {
+                trimestre = atoi(token);
+            }
+
+            if(Numero_columna == colm->Columna_PAIS)
+            {
+                strcpy(codigo_pais, token);
+            }
+
+            if(Numero_columna == colm->Columna_PAIS_DESC)
+            {
+                strcpy(nombre_pais, token);
+            }
+            if(Numero_columna == colm->Columna_OPERACION)
+            {
+                strcpy(operacion, token);
+            }
+
+            if(Numero_columna == colm->Columna_MONTO)
+            {
+                monto = atof(token);
+            }
+
+            if(separador != NULL)
+            {
+                token = separador + 1;
+            }
+            else
+            {
+                token = NULL;
+            }
+
+            Numero_columna++;
+        }
+        if(anio == anio_buscado && trimestre >= 1 && trimestre <= 4)
+        {
+            // printf("Pais: %s | Trimestre: %d | Operacion: %s | Monto: %.2f\n", nombre_pais, trimestre + 1, operacion, monto);
+            trimestre--;
+
+            i = 0;
+
+            while(i < cant_paises &&
+                strcmp(paises[i].codigo, codigo_pais) != 0)
+            {
+                i++;
+            }
+            if(i == cant_paises)
+            {
+                if(cant_paises < 250)
+                {
+                    strcpy(paises[i].codigo, codigo_pais);
+                    strcpy(paises[i].nombre, nombre_pais);
+
+                    j = 0;
+
+                    while(j < 4)
+                    {
+                        paises[i].creditos[j] = 0;
+                        paises[i].debitos[j] = 0;
+                        j++;
+                    }
+
+                    cant_paises++;
+                }
+            }
+            if(i < cant_paises)
+            {
+                if(strcmp(operacion, "C") == 0)
+                {
+                    paises[i].creditos[trimestre] += monto;
+                }
+                else if(strcmp(operacion, "D") == 0)
+                {
+                    paises[i].debitos[trimestre] += monto;
+                }
+            }
+        }
+    }
+
+    /// ORDENAR PAISES POR NOMBRE Y MOSTRAR RESULTADOS
+    int posMenor;
+    PaisTrimestral aux;
+
+    i = 0;
+
+    while(i < cant_paises - 1)
+    {
+        posMenor = i;
+        j = i + 1;
+
+        while(j < cant_paises)
+        {
+            if(strcmp(paises[j].nombre, paises[posMenor].nombre) < 0)
+            {
+                posMenor = j;
+            }
+
+            j++;
+        }
+
+        if(posMenor != i)
+        {
+            aux = paises[i];
+            paises[i] = paises[posMenor];
+            paises[posMenor] = aux;
+        }
+
+        i++;
+    }
+
+    printf("\n%-35s %12s %12s %12s %12s\n","PAIS", "T1", "T2", "T3", "T4");
+
+    i = 0;
+
+    while(i < cant_paises)
+    {
+        printf("%-35s", paises[i].nombre);
+
+        j = 0;
+
+        while(j < 4)
+        {
+            saldo = paises[i].creditos[j] - paises[i].debitos[j];
+
+            printf(" %12.2f", saldo);
+
+            j++;
+        }
+
+        printf("\n");
+
+        i++;
+    }
 }
 
 void Ubicar_Columnas_transferencia(char *linea, Columnas_Transferencias_personales *colm)
